@@ -413,12 +413,9 @@ class TTLCache(_TimedCache):
             expired = False
         else:
             expired = not (self.timer() < link.expires)
-        if expired:
-            return self.__missing__(key)
-        else:
-            if self.__rea:
+            if not expired and self.__rea:
                 link.expires = self.timer() + self.__ttl
-            return cache_getitem(self, key)
+        return self.__missing__(key) if expired else cache_getitem(self, key)
 
     def __setitem__(self, key, value, cache_setitem=Cache.__setitem__):
         with self.timer as time:
